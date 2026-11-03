@@ -101,17 +101,24 @@ def _check_single_style(style: str) -> str | None:
     return None
 
 
+def is_hidden(node: TextNode) -> str | None:
+    """Node'un ebeveyn stil zincirinde bir gizleme kalibi varsa sebebini doner."""
+    for style in node.styles:
+        reason = _check_single_style(style)
+        if reason:
+            return reason
+    return None
+
+
 def find_hidden_text(nodes: list[TextNode]) -> list[HiddenTextFinding]:
     """Metin parcalari arasinda, ebeveyn stil zincirinde bir gizleme kalibi olanlari bulur."""
     findings: list[HiddenTextFinding] = []
 
     for node in nodes:
-        for style in node.styles:
-            reason = _check_single_style(style)
-            if reason:
-                findings.append(
-                    HiddenTextFinding(text=node.text, reason=reason, tag_chain=node.tag_chain)
-                )
-                break
+        reason = is_hidden(node)
+        if reason:
+            findings.append(
+                HiddenTextFinding(text=node.text, reason=reason, tag_chain=node.tag_chain)
+            )
 
     return findings
